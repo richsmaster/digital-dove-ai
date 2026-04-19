@@ -8,7 +8,7 @@ export function Slide7Challenges({ page, total }: { page: number; total: number 
           <div className="inline-block px-6 py-2 rounded-full bg-orange-50 text-[#ea580c] text-2xl font-bold mb-4">
             06 — التحديات
           </div>
-          <h1 className="text-6xl font-black text-[#1e293b]">ليس كل شيء وردياً!</h1>
+          <h1 className="text-6xl font-black text-[#1e293b]">ليس كل شيء كامل!</h1>
           <p className="text-2xl text-[#64748b] mt-3">رغم الروعة، يواجه المسوقون تحديات حقيقية</p>
         </div>
 
