@@ -9,6 +9,7 @@ import { Slide5Ads } from "@/components/slides/Slide5Ads";
 import { Slide6Service } from "@/components/slides/Slide6Service";
 import { Slide7Challenges } from "@/components/slides/Slide7Challenges";
 import { Slide8Conclusion } from "@/components/slides/Slide8Conclusion";
+import { Slide9Companies } from "@/components/slides/Slide9Companies";
 
 export const Route = createFileRoute("/")({
   head: () => ({
