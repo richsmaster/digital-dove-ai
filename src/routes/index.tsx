@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, Grid3x3, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Grid3x3, X, Download, Loader2 } from "lucide-react";
 import { Slide1Title } from "@/components/slides/Slide1Title";
 import { Slide2Intro } from "@/components/slides/Slide2Intro";
 import { Slide3Data } from "@/components/slides/Slide3Data";
@@ -63,7 +63,41 @@ function PresentationApp() {
   const [transitioning, setTransitioning] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [scale, setScale] = useState(1);
+  const [exporting, setExporting] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
+
+  const handleExportPdf = useCallback(async () => {
+    if (!exportRef.current || exporting) return;
+    setExporting(true);
+    try {
+      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+        import("jspdf"),
+        import("html2canvas"),
+      ]);
+      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1920, 1080] });
+      const nodes = exportRef.current.querySelectorAll<HTMLElement>("[data-export-slide]");
+      for (let i = 0; i < nodes.length; i++) {
+        const canvas = await html2canvas(nodes[i], {
+          width: 1920,
+          height: 1080,
+          windowWidth: 1920,
+          windowHeight: 1080,
+          scale: 1,
+          backgroundColor: "#fafbfc",
+          useCORS: true,
+        });
+        const img = canvas.toDataURL("image/jpeg", 0.92);
+        if (i > 0) pdf.addPage([1920, 1080], "landscape");
+        pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
+      }
+      pdf.save("AI-Marketing-Presentation.pdf");
+    } catch (e) {
+      console.error("PDF export failed", e);
+    } finally {
+      setExporting(false);
+    }
+  }, [exporting]);
 
   const goTo = useCallback((target: number) => {
     setCurrent((c) => {
@@ -164,6 +198,15 @@ function PresentationApp() {
             title="عرض الشبكة (G)"
           >
             <Grid3x3 className="w-4 h-4" /> الشبكة
+          </button>
+          <button
+            onClick={handleExportPdf}
+            disabled={exporting}
+            className="px-4 py-2 rounded-lg hover:bg-[#f1f5f9] text-[#475569] font-medium flex items-center gap-2 transition disabled:opacity-60"
+            title="تنزيل PDF"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {exporting ? "جاري التصدير..." : "تنزيل PDF"}
           </button>
           <button
             onClick={() => document.documentElement.requestFullscreen?.()}
@@ -297,7 +340,6 @@ function PresentationApp() {
                   }`}
                   style={{
                     borderColor: i === current ? t.color : undefined,
-                    ringColor: i === current ? t.color : undefined,
                     boxShadow: i === current ? `0 0 30px ${t.color}66` : undefined,
                   }}
                 >
@@ -343,6 +385,30 @@ function PresentationApp() {
           </div>
         </div>
       )}
+
+      {/* ── Offscreen export container (full 1920x1080 per slide) ── */}
+      <div
+        ref={exportRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: -100000,
+          top: 0,
+          width: 1920,
+          pointerEvents: "none",
+          opacity: 0,
+        }}
+      >
+        {slides.map((S, i) => (
+          <div
+            key={`export-${i}`}
+            data-export-slide
+            style={{ width: 1920, height: 1080, overflow: "hidden" }}
+          >
+            <S page={i + 1} total={slides.length} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
