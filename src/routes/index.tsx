@@ -114,9 +114,6 @@ function PresentationApp() {
 
   const Current = slides[current];
   const Prev = slides[prevIndex];
-  // RTL: "next" moves visually to the left
-  const enterFrom = direction === "next" ? "translate-x-full" : "-translate-x-full";
-  const exitTo = direction === "next" ? "-translate-x-full" : "translate-x-full";
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col">
