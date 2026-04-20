@@ -153,15 +153,14 @@ function PresentationApp() {
         {transitioning && prevIndex !== current && (
           <div
             key={`prev-${prevIndex}`}
-            className={`absolute transition-all duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] opacity-0 ${exitTo}`}
+            className={direction === "next" ? "slide-exit-next absolute" : "slide-exit-prev absolute"}
             style={{
               width: 1920,
               height: 1080,
               left: "50%",
               top: "50%",
-              marginLeft: -960,
-              marginTop: -540,
-              transform: `scale(${scale})`,
+              ["--slide-scale" as string]: scale,
+              transform: `translate(-50%, -50%) scale(${scale})`,
               transformOrigin: "center center",
             }}
           >
@@ -172,18 +171,21 @@ function PresentationApp() {
         {/* Incoming slide */}
         <div
           key={`current-${current}`}
-          className={`absolute ${transitioning ? `animate-[slidein_500ms_cubic-bezier(0.65,0,0.35,1)_both]` : ""}`}
+          className={
+            transitioning
+              ? direction === "next"
+                ? "slide-enter-next absolute"
+                : "slide-enter-prev absolute"
+              : "absolute"
+          }
           style={{
             width: 1920,
             height: 1080,
             left: "50%",
             top: "50%",
-            marginLeft: -960,
-            marginTop: -540,
-            transform: `scale(${scale})`,
+            ["--slide-scale" as string]: scale,
+            transform: `translate(-50%, -50%) scale(${scale})`,
             transformOrigin: "center center",
-            // @ts-expect-error custom property
-            "--enter-from": direction === "next" ? "100%" : "-100%",
           }}
         >
           <Current page={current + 1} total={slides.length} />
