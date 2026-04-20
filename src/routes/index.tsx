@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, useCallback } from "react";
-import { ChevronLeft, ChevronRight, Maximize2, Grid3x3, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Grid3x3, X, Download, Loader2 } from "lucide-react";
 import { Slide1Title } from "@/components/slides/Slide1Title";
 import { Slide2Intro } from "@/components/slides/Slide2Intro";
 import { Slide3Data } from "@/components/slides/Slide3Data";
