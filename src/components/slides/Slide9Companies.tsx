@@ -62,53 +62,18 @@ const companies: Company[] = [
     ),
   },
   {
-    name: "HubSpot",
-    country: "🇺🇸 أمريكا",
-    desc: "أتمتة CRM وتخصيص رسائل البريد لكل عميل.",
-    clients: "+200,000 شركة",
-    accent: "#ff7a59",
+    name: "wpro",
+    country: "🌐 عالمية",
+    desc: "منصة ذكاء اصطناعي متكاملة لإدارة التسويق الرقمي وتحسين الحملات الإعلانية.",
+    clients: "علامات تجارية رائدة",
+    accent: "#6366f1",
     logo: (
       <div className="flex items-center gap-2">
-        <div className="w-12 h-12 rounded-full bg-[#ff7a59] flex items-center justify-center shadow-md relative">
-          <div className="absolute inset-2 rounded-full border-[3px] border-white" />
-          <div className="absolute w-1.5 h-4 bg-white rounded-full top-1" />
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#6366f1] to-[#4f46e5] flex items-center justify-center shadow-md">
+          <span className="text-white font-black text-xl">W</span>
         </div>
-        <span className="text-3xl font-black text-[#33475b] tracking-tight">
-          HubSpot
-        </span>
-      </div>
-    ),
-  },
-  {
-    name: "Adext AI",
-    country: "🇲🇽 المكسيك",
-    desc: "يوزّع ميزانيات Google وFacebook تلقائياً للأفضل أداءً.",
-    clients: "وكالات عالمية",
-    accent: "#10b981",
-    logo: (
-      <div className="flex items-center gap-2">
-        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-[#10b981] to-[#059669] flex items-center justify-center shadow-md">
-          <span className="text-white font-black text-2xl">Ax</span>
-        </div>
-        <span className="text-3xl font-black text-[#064e3b] tracking-tight">
-          Adext<span className="text-[#10b981]"> AI</span>
-        </span>
-      </div>
-    ),
-  },
-  {
-    name: "Crayon",
-    country: "🇸🇦 السعودية",
-    desc: "منصة عربية لتحليل المنافسين وتوليد محتوى تسويقي ذكي.",
-    clients: "stc, مصارف خليجية",
-    accent: "#06b6d4",
-    logo: (
-      <div className="flex items-center gap-2">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#22d3ee] via-[#06b6d4] to-[#3b82f6] flex items-center justify-center shadow-md">
-          <span className="text-white font-black text-2xl">✎</span>
-        </div>
-        <span className="text-3xl font-black text-[#155e75] tracking-tight">
-          Crayon
+        <span className="text-3xl font-black text-[#312e81] tracking-tight">
+          w<span className="text-[#6366f1]">pro</span>
         </span>
       </div>
     ),
@@ -124,7 +89,7 @@ export function Slide9Companies({ page, total }: { page: number; total: number }
             07 — أمثلة واقعية
           </div>
           <h1 className="text-6xl font-black text-[#1e293b]">شركات تسويق بالذكاء الاصطناعي</h1>
-          <p className="text-2xl text-[#64748b] mt-3">روّاد عالميون وعرب يقودون الثورة</p>
+
         </div>
 
         <div className="grid grid-cols-3 gap-6 flex-1">

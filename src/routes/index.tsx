@@ -29,6 +29,19 @@ export const Route = createFileRoute("/")({
   component: PresentationApp,
 });
 
+/** Per-slide identity: accent color + emoji + label */
+const slideThemes = [
+  { color: "#6366f1", bg: "#eef2ff", emoji: "🎓", label: "العنوان" },
+  { color: "#3b82f6", bg: "#eff6ff", emoji: "🤖", label: "مقدمة" },
+  { color: "#0ea5e9", bg: "#f0f9ff", emoji: "📊", label: "البيانات" },
+  { color: "#8b5cf6", bg: "#f5f3ff", emoji: "✍️", label: "المحتوى" },
+  { color: "#f59e0b", bg: "#fffbeb", emoji: "📢", label: "الإعلانات" },
+  { color: "#10b981", bg: "#ecfdf5", emoji: "💬", label: "خدمة العملاء" },
+  { color: "#ef4444", bg: "#fef2f2", emoji: "⚡", label: "التحديات" },
+  { color: "#14b8a6", bg: "#f0fdfa", emoji: "🏆", label: "شركات رائدة" },
+  { color: "#a855f7", bg: "#faf5ff", emoji: "🌟", label: "الخلاصة" },
+];
+
 const slides = [
   Slide1Title,
   Slide2Intro,
@@ -41,17 +54,7 @@ const slides = [
   Slide8Conclusion,
 ];
 
-const slideTitles = [
-  "العنوان",
-  "مقدمة",
-  "تحليل البيانات",
-  "صناعة المحتوى",
-  "الإعلانات الذكية",
-  "خدمة العملاء",
-  "التحديات",
-  "شركات رائدة",
-  "الخلاصة",
-];
+
 
 function PresentationApp() {
   const [current, setCurrent] = useState(0);
@@ -68,7 +71,7 @@ function PresentationApp() {
       setPrevIndex(c);
       setDirection(target > c ? "next" : "prev");
       setTransitioning(true);
-      window.setTimeout(() => setTransitioning(false), 600);
+      window.setTimeout(() => setTransitioning(false), 650);
       return target;
     });
   }, []);
@@ -114,17 +117,44 @@ function PresentationApp() {
 
   const Current = slides[current];
   const Prev = slides[prevIndex];
+  const theme = slideThemes[current];
 
   return (
-    <div className="min-h-screen bg-[#0f172a] flex flex-col">
-      <div className="bg-white border-b border-[#e8ecf1] px-6 py-3 flex items-center justify-between shadow-sm z-20">
+    <div className="min-h-screen bg-[#0f172a] flex flex-col" dir="rtl">
+
+      {/* ── Top Progress Bar ── */}
+      <div className="h-1 bg-white/10 relative z-30 flex-shrink-0">
+        <div
+          className="h-full transition-all duration-500 ease-out"
+          style={{
+            width: `${((current + 1) / slides.length) * 100}%`,
+            backgroundColor: theme.color,
+            boxShadow: `0 0 12px 2px ${theme.color}88`,
+          }}
+        />
+      </div>
+
+      {/* ── Navbar ── */}
+      <div
+        className="bg-white border-b border-[#e8ecf1] px-6 py-3 flex items-center justify-between shadow-sm z-20 flex-shrink-0 transition-all duration-500"
+        style={{ borderBottomColor: `${theme.color}33` }}
+      >
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#2563eb] flex items-center justify-center text-white font-black text-xl">
-            AI
+          {/* Logo — color follows slide theme */}
+          <div
+            className="w-10 h-10 rounded-lg flex items-center justify-center text-white font-black text-xl shadow-lg transition-all duration-500"
+            style={{
+              background: `linear-gradient(135deg, ${theme.color}, ${theme.color}cc)`,
+              boxShadow: `0 4px 14px ${theme.color}55`,
+            }}
+          >
+            {theme.emoji}
           </div>
           <div>
             <div className="font-bold text-[#1e293b]">عرض تقديمي تفاعلي</div>
-            <div className="text-xs text-[#64748b]">الذكاء الاصطناعي في التسويق الرقمي</div>
+            <div className="text-xs font-medium transition-colors duration-500" style={{ color: theme.color }}>
+              {theme.label} — {current + 1} / {slides.length}
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -137,7 +167,8 @@ function PresentationApp() {
           </button>
           <button
             onClick={() => document.documentElement.requestFullscreen?.()}
-            className="px-4 py-2 rounded-lg bg-[#3b82f6] hover:bg-[#2563eb] text-white font-medium flex items-center gap-2 transition"
+            className="px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2 transition-all duration-500"
+            style={{ background: theme.color }}
             title="عرض كامل (F)"
           >
             <Maximize2 className="w-4 h-4" /> عرض كامل
@@ -145,6 +176,7 @@ function PresentationApp() {
         </div>
       </div>
 
+      {/* ── Slide Stage ── */}
       <div ref={containerRef} className="flex-1 relative overflow-hidden">
         {/* Outgoing slide */}
         {transitioning && prevIndex !== current && (
@@ -188,76 +220,126 @@ function PresentationApp() {
           <Current page={current + 1} total={slides.length} />
         </div>
 
+        {/* ── Nav Buttons ── */}
         <button
           onClick={prev}
           disabled={current === 0}
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-[#1e293b] disabled:opacity-30 transition z-10"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 hover:scale-110 shadow-xl flex items-center justify-center disabled:opacity-20 transition-all duration-200 z-10 border-2"
+          style={{ borderColor: `${theme.color}55`, color: theme.color }}
         >
           <ChevronRight className="w-6 h-6" />
         </button>
         <button
           onClick={next}
           disabled={current === slides.length - 1}
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/90 hover:bg-white shadow-lg flex items-center justify-center text-[#1e293b] disabled:opacity-30 transition z-10"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 hover:scale-110 shadow-xl flex items-center justify-center disabled:opacity-20 transition-all duration-200 z-10 border-2"
+          style={{ borderColor: `${theme.color}55`, color: theme.color }}
         >
           <ChevronLeft className="w-6 h-6" />
         </button>
 
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => goTo(i)}
-              className={`h-2 rounded-full transition-all ${
-                i === current ? "w-8 bg-[#3b82f6]" : "w-2 bg-[#cbd5e1] hover:bg-[#94a3b8]"
-              }`}
-            />
-          ))}
+        {/* ── Progress Dots with Tooltip ── */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 bg-white/95 backdrop-blur-sm px-4 py-2.5 rounded-full shadow-xl z-10">
+          {slides.map((_, i) => {
+            const t = slideThemes[i];
+            return (
+              <button
+                key={i}
+                onClick={() => goTo(i)}
+                title={t.label}
+                className={`relative group rounded-full transition-all duration-400 ${
+                  i === current ? "w-9 h-3 slide-dot-active" : "w-3 h-3 hover:scale-125"
+                }`}
+                style={{
+                  backgroundColor: i === current ? t.color : "#cbd5e1",
+                  color: t.color,
+                }}
+              >
+                {/* Tooltip */}
+                <span
+                  className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-2 py-1 rounded text-[10px] font-bold text-white whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                  style={{ backgroundColor: t.color }}
+                >
+                  {t.emoji} {t.label}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
+      {/* ── Grid View ── */}
       {showGrid && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 overflow-auto p-8" dir="rtl">
+        <div className="fixed inset-0 bg-black/85 backdrop-blur-md z-50 overflow-auto p-8" dir="rtl">
           <div className="flex justify-between items-center mb-8 max-w-7xl mx-auto">
-            <h2 className="text-3xl font-bold text-white">جميع الشرائح</h2>
+            <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+              <span className="text-2xl">🗂️</span> جميع الشرائح
+            </h2>
             <button
               onClick={() => setShowGrid(false)}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center"
+              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/25 text-white flex items-center justify-center transition"
             >
               <X />
             </button>
           </div>
           <div className="grid grid-cols-3 gap-6 max-w-7xl mx-auto">
-            {slides.map((S, i) => (
-              <button
-                key={i}
-                onClick={() => {
-                  goTo(i);
-                  setShowGrid(false);
-                }}
-                className={`relative overflow-hidden rounded-xl bg-white shadow-xl border-4 transition aspect-video ${
-                  i === current ? "border-[#3b82f6] scale-105" : "border-transparent hover:border-white/40"
-                }`}
-              >
-                <div
-                  className="absolute"
+            {slides.map((S, i) => {
+              const t = slideThemes[i];
+              return (
+                <button
+                  key={i}
+                  onClick={() => {
+                    goTo(i);
+                    setShowGrid(false);
+                  }}
+                  className={`relative overflow-hidden rounded-2xl bg-white shadow-2xl border-4 transition-all duration-300 aspect-video hover:scale-[1.03] ${
+                    i === current ? "scale-105 ring-4" : "border-transparent hover:border-white/30"
+                  }`}
                   style={{
-                    width: 1920,
-                    height: 1080,
-                    left: 0,
-                    top: 0,
-                    transform: "scale(0.2)",
-                    transformOrigin: "top left",
+                    borderColor: i === current ? t.color : undefined,
+                    ringColor: i === current ? t.color : undefined,
+                    boxShadow: i === current ? `0 0 30px ${t.color}66` : undefined,
                   }}
                 >
-                  <S page={i + 1} total={slides.length} />
-                </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white px-3 py-2 text-sm font-bold flex justify-between">
-                  <span>{slideTitles[i]}</span>
-                  <span>{i + 1}</span>
-                </div>
-              </button>
-            ))}
+                  {/* Slide thumbnail */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: 1920,
+                      height: 1080,
+                      left: 0,
+                      top: 0,
+                      transform: "scale(0.2)",
+                      transformOrigin: "top left",
+                    }}
+                  >
+                    <S page={i + 1} total={slides.length} />
+                  </div>
+
+                  {/* Badge: number top-left */}
+                  <div
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full text-white text-xs font-black flex items-center justify-center shadow-lg"
+                    style={{ backgroundColor: t.color }}
+                  >
+                    {i + 1}
+                  </div>
+
+                  {/* Footer label */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 text-white px-3 py-2 text-sm font-bold flex justify-between items-center"
+                    style={{ backgroundColor: `${t.color}ee` }}
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <span>{t.emoji}</span>
+                      {t.label}
+                    </span>
+                    {i === current && (
+                      <span className="text-xs bg-white/25 px-2 py-0.5 rounded-full">الحالي</span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
