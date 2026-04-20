@@ -297,7 +297,6 @@ function PresentationApp() {
                   }`}
                   style={{
                     borderColor: i === current ? t.color : undefined,
-                    ringColor: i === current ? t.color : undefined,
                     boxShadow: i === current ? `0 0 30px ${t.color}66` : undefined,
                   }}
                 >
