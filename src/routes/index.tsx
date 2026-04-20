@@ -9,6 +9,7 @@ import { Slide5Ads } from "@/components/slides/Slide5Ads";
 import { Slide6Service } from "@/components/slides/Slide6Service";
 import { Slide7Challenges } from "@/components/slides/Slide7Challenges";
 import { Slide8Conclusion } from "@/components/slides/Slide8Conclusion";
+import { Slide9Companies } from "@/components/slides/Slide9Companies";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -36,6 +37,7 @@ const slides = [
   Slide5Ads,
   Slide6Service,
   Slide7Challenges,
+  Slide9Companies,
   Slide8Conclusion,
 ];
 
@@ -47,17 +49,35 @@ const slideTitles = [
   "الإعلانات الذكية",
   "خدمة العملاء",
   "التحديات",
+  "شركات رائدة",
   "الخلاصة",
 ];
 
 function PresentationApp() {
   const [current, setCurrent] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
+  const [transitioning, setTransitioning] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const next = useCallback(() => setCurrent((c) => Math.min(c + 1, slides.length - 1)), []);
-  const prev = useCallback(() => setCurrent((c) => Math.max(c - 1, 0)), []);
+  const goTo = useCallback((target: number) => {
+    setCurrent((c) => {
+      if (target === c) return c;
+      setPrevIndex(c);
+      setDirection(target > c ? "next" : "prev");
+      setTransitioning(true);
+      window.setTimeout(() => setTransitioning(false), 600);
+      return target;
+    });
+  }, []);
+
+  const next = useCallback(
+    () => goTo(Math.min(current + 1, slides.length - 1)),
+    [current, goTo],
+  );
+  const prev = useCallback(() => goTo(Math.max(current - 1, 0)), [current, goTo]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -67,8 +87,8 @@ function PresentationApp() {
       }
       if (e.key === "ArrowLeft" || e.key === "PageDown" || e.key === " ") next();
       else if (e.key === "ArrowRight" || e.key === "PageUp") prev();
-      else if (e.key === "Home") setCurrent(0);
-      else if (e.key === "End") setCurrent(slides.length - 1);
+      else if (e.key === "Home") goTo(0);
+      else if (e.key === "End") goTo(slides.length - 1);
       else if (e.key === "g" || e.key === "G") setShowGrid((v) => !v);
       else if (e.key === "F5" || e.key === "f") {
         e.preventDefault();
@@ -93,6 +113,7 @@ function PresentationApp() {
   }, []);
 
   const Current = slides[current];
+  const Prev = slides[prevIndex];
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col">
@@ -125,16 +146,42 @@ function PresentationApp() {
       </div>
 
       <div ref={containerRef} className="flex-1 relative overflow-hidden">
+        {/* Outgoing slide */}
+        {transitioning && prevIndex !== current && (
+          <div
+            key={`prev-${prevIndex}`}
+            className={direction === "next" ? "slide-exit-next absolute" : "slide-exit-prev absolute"}
+            style={{
+              width: 1920,
+              height: 1080,
+              left: "50%",
+              top: "50%",
+              ["--slide-scale" as string]: scale,
+              transform: `translate(-50%, -50%) scale(${scale})`,
+              transformOrigin: "center center",
+            }}
+          >
+            <Prev page={prevIndex + 1} total={slides.length} />
+          </div>
+        )}
+
+        {/* Incoming slide */}
         <div
-          className="absolute"
+          key={`current-${current}`}
+          className={
+            transitioning
+              ? direction === "next"
+                ? "slide-enter-next absolute"
+                : "slide-enter-prev absolute"
+              : "absolute"
+          }
           style={{
             width: 1920,
             height: 1080,
             left: "50%",
             top: "50%",
-            marginLeft: -960,
-            marginTop: -540,
-            transform: `scale(${scale})`,
+            ["--slide-scale" as string]: scale,
+            transform: `translate(-50%, -50%) scale(${scale})`,
             transformOrigin: "center center",
           }}
         >
@@ -160,7 +207,7 @@ function PresentationApp() {
           {slides.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrent(i)}
+              onClick={() => goTo(i)}
               className={`h-2 rounded-full transition-all ${
                 i === current ? "w-8 bg-[#3b82f6]" : "w-2 bg-[#cbd5e1] hover:bg-[#94a3b8]"
               }`}
@@ -185,7 +232,7 @@ function PresentationApp() {
               <button
                 key={i}
                 onClick={() => {
-                  setCurrent(i);
+                  goTo(i);
                   setShowGrid(false);
                 }}
                 className={`relative overflow-hidden rounded-xl bg-white shadow-xl border-4 transition aspect-video ${
