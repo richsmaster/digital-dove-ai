@@ -113,6 +113,10 @@ function PresentationApp() {
   }, []);
 
   const Current = slides[current];
+  const Prev = slides[prevIndex];
+  // RTL: "next" moves visually to the left
+  const enterFrom = direction === "next" ? "translate-x-full" : "-translate-x-full";
+  const exitTo = direction === "next" ? "-translate-x-full" : "translate-x-full";
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col">
@@ -145,8 +149,30 @@ function PresentationApp() {
       </div>
 
       <div ref={containerRef} className="flex-1 relative overflow-hidden">
+        {/* Outgoing slide */}
+        {transitioning && prevIndex !== current && (
+          <div
+            key={`prev-${prevIndex}`}
+            className={`absolute transition-all duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] opacity-0 ${exitTo}`}
+            style={{
+              width: 1920,
+              height: 1080,
+              left: "50%",
+              top: "50%",
+              marginLeft: -960,
+              marginTop: -540,
+              transform: `scale(${scale})`,
+              transformOrigin: "center center",
+            }}
+          >
+            <Prev page={prevIndex + 1} total={slides.length} />
+          </div>
+        )}
+
+        {/* Incoming slide */}
         <div
-          className="absolute"
+          key={`current-${current}`}
+          className={`absolute ${transitioning ? `animate-[slidein_500ms_cubic-bezier(0.65,0,0.35,1)_both]` : ""}`}
           style={{
             width: 1920,
             height: 1080,
@@ -156,6 +182,8 @@ function PresentationApp() {
             marginTop: -540,
             transform: `scale(${scale})`,
             transformOrigin: "center center",
+            // @ts-expect-error custom property
+            "--enter-from": direction === "next" ? "100%" : "-100%",
           }}
         >
           <Current page={current + 1} total={slides.length} />
@@ -180,7 +208,7 @@ function PresentationApp() {
           {slides.map((_, i) => (
             <button
               key={i}
-              onClick={() => setCurrent(i)}
+              onClick={() => goTo(i)}
               className={`h-2 rounded-full transition-all ${
                 i === current ? "w-8 bg-[#3b82f6]" : "w-2 bg-[#cbd5e1] hover:bg-[#94a3b8]"
               }`}
@@ -205,7 +233,7 @@ function PresentationApp() {
               <button
                 key={i}
                 onClick={() => {
-                  setCurrent(i);
+                  goTo(i);
                   setShowGrid(false);
                 }}
                 className={`relative overflow-hidden rounded-xl bg-white shadow-xl border-4 transition aspect-video ${
