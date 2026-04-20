@@ -385,6 +385,30 @@ function PresentationApp() {
           </div>
         </div>
       )}
+
+      {/* ── Offscreen export container (full 1920x1080 per slide) ── */}
+      <div
+        ref={exportRef}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          left: -100000,
+          top: 0,
+          width: 1920,
+          pointerEvents: "none",
+          opacity: 0,
+        }}
+      >
+        {slides.map((S, i) => (
+          <div
+            key={`export-${i}`}
+            data-export-slide
+            style={{ width: 1920, height: 1080, overflow: "hidden" }}
+          >
+            <S page={i + 1} total={slides.length} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
