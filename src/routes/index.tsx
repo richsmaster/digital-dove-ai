@@ -71,25 +71,23 @@ function PresentationApp() {
     if (!exportRef.current || exporting) return;
     setExporting(true);
     try {
-      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
+      const [{ default: jsPDF }, { toJpeg }] = await Promise.all([
         import("jspdf"),
-        import("html2canvas"),
+        import("html-to-image"),
       ]);
       const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1920, 1080] });
       const nodes = exportRef.current.querySelectorAll<HTMLElement>("[data-export-slide]");
       for (let i = 0; i < nodes.length; i++) {
-        const canvas = await html2canvas(nodes[i], {
+        const dataUrl = await toJpeg(nodes[i], {
           width: 1920,
           height: 1080,
-          windowWidth: 1920,
-          windowHeight: 1080,
-          scale: 1,
+          quality: 0.92,
           backgroundColor: "#fafbfc",
-          useCORS: true,
+          cacheBust: true,
+          pixelRatio: 1,
         });
-        const img = canvas.toDataURL("image/jpeg", 0.92);
         if (i > 0) pdf.addPage([1920, 1080], "landscape");
-        pdf.addImage(img, "JPEG", 0, 0, 1920, 1080);
+        pdf.addImage(dataUrl, "JPEG", 0, 0, 1920, 1080);
       }
       pdf.save("AI-Marketing-Presentation.pdf");
     } catch (e) {
