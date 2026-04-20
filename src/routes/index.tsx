@@ -37,6 +37,7 @@ const slides = [
   Slide5Ads,
   Slide6Service,
   Slide7Challenges,
+  Slide9Companies,
   Slide8Conclusion,
 ];
 
@@ -48,17 +49,35 @@ const slideTitles = [
   "الإعلانات الذكية",
   "خدمة العملاء",
   "التحديات",
+  "شركات رائدة",
   "الخلاصة",
 ];
 
 function PresentationApp() {
   const [current, setCurrent] = useState(0);
+  const [prevIndex, setPrevIndex] = useState(0);
+  const [direction, setDirection] = useState<"next" | "prev">("next");
+  const [transitioning, setTransitioning] = useState(false);
   const [showGrid, setShowGrid] = useState(false);
   const [scale, setScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const next = useCallback(() => setCurrent((c) => Math.min(c + 1, slides.length - 1)), []);
-  const prev = useCallback(() => setCurrent((c) => Math.max(c - 1, 0)), []);
+  const goTo = useCallback((target: number) => {
+    setCurrent((c) => {
+      if (target === c) return c;
+      setPrevIndex(c);
+      setDirection(target > c ? "next" : "prev");
+      setTransitioning(true);
+      window.setTimeout(() => setTransitioning(false), 600);
+      return target;
+    });
+  }, []);
+
+  const next = useCallback(
+    () => goTo(Math.min(current + 1, slides.length - 1)),
+    [current, goTo],
+  );
+  const prev = useCallback(() => goTo(Math.max(current - 1, 0)), [current, goTo]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -68,8 +87,8 @@ function PresentationApp() {
       }
       if (e.key === "ArrowLeft" || e.key === "PageDown" || e.key === " ") next();
       else if (e.key === "ArrowRight" || e.key === "PageUp") prev();
-      else if (e.key === "Home") setCurrent(0);
-      else if (e.key === "End") setCurrent(slides.length - 1);
+      else if (e.key === "Home") goTo(0);
+      else if (e.key === "End") goTo(slides.length - 1);
       else if (e.key === "g" || e.key === "G") setShowGrid((v) => !v);
       else if (e.key === "F5" || e.key === "f") {
         e.preventDefault();
