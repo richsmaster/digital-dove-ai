@@ -200,6 +200,15 @@ function PresentationApp() {
             <Grid3x3 className="w-4 h-4" /> الشبكة
           </button>
           <button
+            onClick={handleExportPdf}
+            disabled={exporting}
+            className="px-4 py-2 rounded-lg hover:bg-[#f1f5f9] text-[#475569] font-medium flex items-center gap-2 transition disabled:opacity-60"
+            title="تنزيل PDF"
+          >
+            {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+            {exporting ? "جاري التصدير..." : "تنزيل PDF"}
+          </button>
+          <button
             onClick={() => document.documentElement.requestFullscreen?.()}
             className="px-4 py-2 rounded-lg text-white font-medium flex items-center gap-2 transition-all duration-500"
             style={{ background: theme.color }}
